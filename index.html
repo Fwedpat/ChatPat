@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PatGPT</title>
+    <style>
+        html, body {
+            background: transparent;
+            margin: 0;
+            padding: 0;
+            height: auto;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .window-content {
+            margin: 20px;
+            width: calc(100% - 40px);
+            height: auto;
+            transition: all 0.3s ease;
+        }
+
+        .title-bar {
+            -webkit-app-region: drag;
+            color: #FF69B4;
+            text-align: center;
+            white-space: pre;
+            font-size: 12px;
+            font-family: monospace;
+            line-height: 1;
+            text-shadow: 
+                0 0 5px rgba(255, 105, 180, 0.5),   /* Inner glow */
+                0 0 10px rgba(255, 105, 180, 0.3),  /* Middle glow */
+                0 0 15px rgba(255, 105, 180, 0.2);  /* Outer glow */
+            margin-bottom: 20px;
+            user-select: none;
+            font-weight: bold;
+        }
+
+        #chat-container {
+            background-color: rgba(35, 35, 35, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.3s ease;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        #userInput {
+            width: 100%;
+            padding: 12px;
+            background-color: transparent;
+            border: 1px solid #505050;
+            border-radius: 4px;
+            color: #d4d4d4;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Consolas', monospace;
+            font-size: 14px;
+            resize: none;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+            height: 60px;
+            min-height: 60px;
+            padding-right: 45px;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        #userInput::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        #userInput {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        #response {
+            color: #d4d4d4;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.6;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Consolas', monospace;
+            padding-left: 10px;
+        }
+
+        #response:not(:empty) {
+            border-radius: 12px;
+            padding: 20px;
+            background-color: rgba(40, 44, 52, 0.8);
+            margin-bottom: 10px;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        * {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .dropdown-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: -10px;
+        }
+
+        .color-picker {
+            width: 100px;
+            background-color: rgba(45, 45, 45, 0.95);
+            color: #d4d4d4;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            align-self: left;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Consolas', monospace;
+        }
+
+        .color-picker:hover {
+            background-color: rgba(55, 55, 55, 0.95);
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .history-button {
+            position: absolute;
+            right: 15px;
+            top: 48%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            border: 1px solid #505050;
+            border-radius: 4px;
+            color: #d4d4d4;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .history-button:hover {
+            background-color: rgba(80, 80, 80, 0.3);
+            border-color: #666;
+        }
+
+        /* Code block styling */
+        pre {
+            background-color: #282c34;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #3e4451;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Override highlight.js theme colors */
+        .hljs {
+            background: #282c34 !important;
+            color: #abb2bf !important;
+            border-radius: 6px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: rgba(35, 35, 35, 0.95);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #3e4451;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            color: #d4d4d4;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+
+        .history-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: rgba(40, 44, 52, 0.3);
+            border-radius: 4px;
+            color: #d4d4d4;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .history-item:hover {
+            background-color: rgba(40, 44, 52, 0.5);
+        }
+
+        .history-dropdown {
+            display: none;
+            position: absolute;
+            right: 15px;
+            top: 45px;
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: rgba(35, 35, 35, 0.95);
+            border: 1px solid #3e4451;
+            border-radius: 8px;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            padding: 8px;
+        }
+
+        .history-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: rgba(40, 44, 52, 0.3);
+            border-radius: 4px;
+            color: #d4d4d4;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .history-item:hover {
+            background-color: rgba(40, 44, 52, 0.5);
+        }
+
+        .history-item-title {
+            font-weight: bold;
+            color: #d4d4d4;
+            margin-bottom: 4px;
+        }
+
+        .history-item-content {
+            color: #abb2bf;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="window-content">
+        <div class="title-bar">
+        ██████╗ ██╗  ██╗ █████╗ ████████╗██████╗  █████╗ ████████╗
+        ██╔════╝██║  ██║██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝
+        ██║     ███████║███████║   ██║   ██████╗ ███████║   ██║   
+        ██║     ██╔══██║██╔══██║   ██║   ██╔═══╝ ██╔══██║   ██║   
+        ╚██████╗██║  ██║██║  ██║   ██║   ██║     ██║  ██║   ██║   
+         ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝   ╚═╝   </div>
+        <div id="chat-container">
+            <div class="input-wrapper">
+                <textarea id="userInput" rows="3" placeholder="What would Baby Gronk say to rizz Livvy Dunne?"></textarea>
+                <button id="historyButton" class="history-button">📜</button>
+            </div>
+            <div id="response"></div>
+            <div class="dropdown-container">
+                <select id="colorPicker" class="color-picker">
+                    <option value="#FF69B4" selected>Pink</option>
+                    <option value="#F7DC6F">Yellow</option>
+                    <option value="#00FF00">Green</option>
+                    <option value="#00BFFF">Blue</option>
+                    <option value="#FF4500">Orange</option>
+                    <option value="#9B59B6">Purple</option>
+                </select>
+                <select id="modelPicker" class="color-picker">
+                    <option value="llama-3.1-70b-versatile">Llama 3.1 🦙</option>
+                    <option value="gemma2-9b-it">Gemma 7B</option>
+                    <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+                </select>
+            </div>
+            <div id="historyDropdown" class="history-dropdown"></div>
+        </div>
+    </div>
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Chat History</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="historyList"></div>
+            </div>
+        </div>
+    </div>
+    <script src="renderer.js"></script>
+</body>
+</html> 
