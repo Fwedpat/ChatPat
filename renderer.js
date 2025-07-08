@@ -5,6 +5,8 @@ const historyButton = document.getElementById('historyButton');
 const colorPicker = document.getElementById('colorPicker');
 const modelPicker = document.getElementById('modelPicker');
 const historyDropdown = document.getElementById('historyDropdown');
+const reasoningDropdown = document.getElementById('reasoningDropdown');
+
 
 let currentResponse = '';
 let isGenerating = false;
@@ -12,6 +14,7 @@ let shouldStop = false;
 let currentCodeBlock = '';
 let isInCodeBlock = false;
 let fullResponse = '';
+let reasoningResponse = '';
 
 // Input event listeners
 userInput.addEventListener('keydown', async (e) => {
@@ -22,36 +25,70 @@ userInput.addEventListener('keydown', async (e) => {
 });
 
 // Handle streaming response
-ipcRenderer.on('stream-response', (event, content) => {
+ipcRenderer.on('stream-response', (event, content, reasoning = "") => {
     fullResponse += content;
-    
-    // Clear the response div
-    responseDiv.innerHTML = '';
-    
-    // Split the full response into parts by code block markers
+    reasoningResponse += reasoning;
+
+    console.log('This is a message from the main process');
+
+    responseDiv.innerHTML = `
+        <details style="margin-top: -40px; margin-bottom: -40px; padding: 0;">
+          <summary style="margin: 0; padding: 0; font-style: italic" class="thinkingDropdown">Thinking...</summary>
+          <p style="color: white; margin-top: -60px; margin-bottom: -40px; padding: 0;">${reasoningResponse}</p>
+        </details>
+    `;
+
+    // Process the fullResponse to split into parts (code blocks and text)
     const parts = fullResponse.split(/(```[\s\S]*?```)/g);
-    
     parts.forEach(part => {
         if (part.startsWith('```')) {
-            // This is a code block
+            // Process code blocks as before
             const codeContent = part.replace(/```(\w+)?\n/, '').replace(/```$/, '');
             const pre = document.createElement('pre');
             const code = document.createElement('code');
             code.textContent = codeContent;
             pre.appendChild(code);
+            
+            // Create and configure copy button (if needed)
+            const copyButton = document.createElement('button');
+            copyButton.textContent = 'Copy';
+            // (Button styles and events remain unchanged)
+            copyButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(codeContent).then(() => {
+                    copyButton.textContent = 'Copied!';
+                    setTimeout(() => { 
+                        copyButton.textContent = 'Copy';
+                    }, 1500);
+                });
+            });
+            pre.appendChild(copyButton);
             responseDiv.appendChild(pre);
             hljs.highlightElement(code);
         } else if (part.trim()) {
-            // This is regular text - handle bold formatting
-            const div = document.createElement('div');
-            div.innerHTML = part.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-            responseDiv.appendChild(div);
+            // Process regular text and allow HTML formatting if needed
+            const responseTextDiv = document.createElement('div');
+            // You can include your bold formatting here if needed.
+            responseTextDiv.innerHTML = part.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            responseDiv.appendChild(responseTextDiv);
         }
     });
-
-    // Scroll to bottom
+    
+    // **Trigger KaTeX to render any LaTeX expressions in the updated response**
+    renderMathInElement(responseTextDiv, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: true},
+            {left: '\(', right: '\)', display: true},
+            {left: '\\[', right: '\\]', display: true}
+        ]
+    });
+    
+    // Scroll to the bottom of the response container
     responseDiv.scrollTop = responseDiv.scrollHeight;
 });
+
+
+
 
 // Clear response handler
 ipcRenderer.on('clear-response', () => {

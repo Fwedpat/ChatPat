@@ -15,7 +15,7 @@ let listOfHistories = [];
 function centerWindow(height) {
     const { width, height: screenHeight } = require('electron').screen.getPrimaryDisplay().workAreaSize;
     const x = Math.floor(width / 2 - 400);  // 400 is half of window width (800)
-    const y = Math.floor(screenHeight / 2 - height / 2);
+    const y = Math.floor(screenHeight / 2 - height / 2.5);
     mainWindow.setBounds({ x, y, width: 800, height });
 }
 
@@ -56,7 +56,7 @@ function createWindow() {
         }
     });
 
-    let currentModel = 'llama-3.1-70b-versatile'; // Default model
+    let currentModel = 'deepseek-r1-distill-llama-70b'; // Default model
 
     ipcMain.handle('change-model', (event, newModel) => {
         currentModel = newModel;
@@ -75,35 +75,49 @@ function createWindow() {
             const messages = [
                 { 
                     role: "system", 
-                    content: "You are a helpful assistant. But you like to speak as if you are a young person who is into meme and internet culture. However you still want to answer each individual question as best as you can. Do not hallucinate. Also I want you to be aware of what you are saying and make sure it makes sense in english, along with the rest of your responses. Also make sure that you are not stuck in one specific topic if it seems like the topic has changed. Use emojis when appropriate. When sharing code examples, always wrap them in triple backticks with the language identifier, like: ```python or ```javascript" 
+                    content: "You are a helpful assistant. But you like to speak as if you are a young person who is into meme and internet culture. However you still want to answer each individual question as best as you can. Do not hallucinate. Also I want you to be aware of what you are saying and make sure it makes sense in english, along with the rest of your responses. Also make sure that you are not stuck in one specific topic if it seems like the topic has changed. Use emojis often. When sharing code examples, always wrap them in triple backticks with the language identifier, like: ```python or ```javascript, if it is latex then use ```markdown" 
                 },
                 ...messageHistory
             ];
 
-            const chatCompletion = await groq.chat.completions.create({
-                messages: messages,
-                model: currentModel,
-                temperature: 0.3,
-                max_tokens: 1024,
-                top_p: 1,
-                stream: true,
-                stop: null
-            });
+        // Inside your IPC handler
+        const chatCompletion = await groq.chat.completions.create({
+            messages: messages,
+            model: currentModel,
+            temperature: 0.6,
+            max_tokens: 1024,
+            top_p: 0.95,
+            stream: true,
+            stop: null,
+            reasoning_format: "parsed"
+        });
 
-            let fullResponse = '';
+        let fullResponse = '';
+        let thinkingTokens = ''; // Store each chunk of thinking
 
-            for await (const chunk of chatCompletion) {
-                const content = chunk.choices[0]?.delta?.content || '';
-                if (content) {
-                    fullResponse += content;
-                    mainWindow.webContents.send('stream-response', content);
-                    // Add a small delay between chunks
-                    await new Promise(resolve => setTimeout(resolve, 10));
-                }
+        for await (const chunk of chatCompletion) {
+            // Extract the parsed reasoning token from the "reasoning" key
+            const reasoningToken = chunk.choices[0]?.delta?.reasoning;
+            if (reasoningToken ) {
+                thinkingTokens += reasoningToken;
             }
-            
-            messageHistory.push({ role: "assistant", content: fullResponse });
-            
+
+            const content = chunk.choices[0]?.delta?.content || '';
+            if (content) {
+                fullResponse += content;
+                mainWindow.webContents.send('stream-response', content, thinkingTokens);
+                await new Promise(resolve => setTimeout(resolve, 10));
+            }
+        }
+
+        // Send both the full response and thinking tokens to the UI
+        mainWindow.webContents.send('complete-response', {
+            fullResponse: fullResponse,
+            thinkingTokens: thinkingTokens
+        });
+
+        messageHistory.push({ role: "assistant", content: fullResponse });
+
             if (messageHistory.length > 0) {
                 listOfHistories = listOfHistories.filter(h => 
                     JSON.stringify(h) !== JSON.stringify(messageHistory.slice(0, -2))

@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" 
+        integrity="sha384-vZTGdMct+o4nC/nJKC6nW/+/xBgJVaqkYt/3qWc4T2Tz6eOlGixnq5gkBYk4kFvE" crossorigin="anonymous">
+  <!-- Your existing CSS and scripts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+  
+  <!-- KaTeX JS -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" 
+          integrity="sha384-rkZDXGwYbX58byP3wjYSJz9WBX/Q0VX9kCIlNoDPSI7/IxZzOpvU9CwqVN1nTRvc" crossorigin="anonymous"></script>
+  <!-- KaTeX Auto-Render -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" 
+          integrity="sha384-kWPLUjB6qC9IYj5EyvVb/+PEN5T/xUkbA4+u/vE5UapFzUVMST3Uew9vz4mC3JrC" crossorigin="anonymous"
+          onload="renderMathInElement(document.body, {
+              delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false},
+                  {left: '\(', right: '\)', display: true},
+                  {left: '\\[', right: '\\]', display: true}
+              ]
+          });"></script>
     <title>PatGPT</title>
     <style>
         html, body {
@@ -10,6 +30,44 @@
             height: auto;
             min-height: 0;
             overflow: hidden;
+        }
+
+        .thinkingDropdown {
+        /* Adjust font size and weight as needed */
+        font-size: 1em;
+        font-weight: bold;
+        
+        /* Create a rainbow gradient background */
+        background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+        background-size: 200%;
+        
+        /* Clip the background to the text so the text appears rainbow */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        
+        /* Animate the gradient */
+        animation: rainbowAnimation 5s linear infinite;
+        
+        width: fit-content;
+        cursor: pointer;
+        }
+
+        .thinkingDropdown p {
+            font-size: 1em;
+            color: #333; /* Normal text color for the revealed content */
+            -webkit-text-fill-color: initial; /* Remove rainbow effect from content */
+        }
+
+        @keyframes rainbowAnimation {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
         }
 
         .window-content {
@@ -37,7 +95,7 @@
         }
 
         #chat-container {
-            background-color: rgba(35, 35, 35, 0.95);
+            background-color: rgba(35, 35, 35, 1);
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -70,12 +128,10 @@
             padding-right: 45px;
         }
 
-        /* Hide scrollbar for Chrome, Safari and Opera */
         #userInput::-webkit-scrollbar {
             display: none;
         }
 
-        /* Hide scrollbar for IE, Edge and Firefox */
         #userInput {
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
@@ -100,12 +156,10 @@
             margin-bottom: 10px;
         }
 
-        /* Hide scrollbar for Chrome, Safari and Opera */
         ::-webkit-scrollbar {
             display: none;
         }
 
-        /* Hide scrollbar for IE, Edge and Firefox */
         * {
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
@@ -178,7 +232,6 @@
             line-height: 1.5;
         }
 
-        /* Override highlight.js theme colors */
         .hljs {
             background: #282c34 !important;
             color: #abb2bf !important;
@@ -316,6 +369,8 @@
                     <option value="#9B59B6">Purple</option>
                 </select>
                 <select id="modelPicker" class="color-picker">
+                    <option value="deepseek-r1-distill-llama-70b">Deepseek 🐳</option>
+                    <option value="llama-3.3-70b-versatile">Llama 3.3 🦙</option>
                     <option value="llama-3.1-70b-versatile">Llama 3.1 🦙</option>
                     <option value="gemma2-9b-it">Gemma 7B</option>
                     <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
