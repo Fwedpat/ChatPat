@@ -13,6 +13,9 @@ ChatPat is an interactive chat application that leverages the power of Large Lan
 - 🚀 Fast and responsive interactions
 - 📱 User-friendly design
 
+- Code blocks with language specific synatx highlighting
+- Latex support for mathematics  
+
 ## Example
 
 ![ChatPat Example](Readme_Example.png)
