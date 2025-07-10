@@ -8,9 +8,8 @@ ChatPat is an interactive chat application that leverages Groq to provide intell
 - 💬 Natural conversation interface
 - 🚀 Fast and responsive interactions
 - 📱 User-friendly design
-
-- Code blocks with language specific synatx highlighting
-- Latex support for mathematics  
+- 📺 Code blocks with language specific synatx highlighting
+- 🔢 Latex support for mathematics  
 
 ## Example
 
