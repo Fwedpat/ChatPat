@@ -1,6 +1,6 @@
 ## Overview
 
-ChatPat is an interactive chat application that leverages Groq to provide intelligent, context-aware conversations. Much quicker inferance, assessability and ease-of-use, ChatPat is designed to understand and respond naturally. As someone who just wants to have a quick shortcut key that can answer my question anywhere without using Microsoft Copilot's slow, unintuitive interface or Chatgpt website.
+ChatPat is an interactive chat application that leverages Groq to provide intelligent, context-aware conversations with much quicker inferance, assessability and ease-of-use that other provided desktop apps. As someone who just wants to have a quick shortcut key that can answer my question anywhere without using Microsoft Copilot's slow, unintuitive interface or Chatgpt' App/Website.
 
 ## Features
 
