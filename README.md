@@ -1,10 +1,6 @@
-# ChatPat
-
-A conversational AI application powered by Large Language Models (LLM).
-
 ## Overview
 
-ChatPat is an interactive chat application that leverages the power of Large Language Models to provide intelligent, context-aware conversations. Whether you're looking for assistance, information, or just want to have a meaningful dialogue, ChatPat is designed to understand and respond naturally.
+ChatPat is an interactive chat application that leverages Groq to provide intelligent, context-aware conversations. Much quicker inferance, assessability and ease-of-use, ChatPat is designed to understand and respond naturally. As someone who just wants to have a quick shortcut key that can answer my question anywhere without using Microsoft Copilot's slow, unintuitive interface or Chatgpt website.
 
 ## Features
 
