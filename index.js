@@ -56,7 +56,7 @@ function createWindow() {
         }
     });
 
-    let currentModel = 'deepseek-r1-distill-llama-70b'; // Default model
+    let currentModel = 'qwen-qwq-32b'; // Default model
 
     ipcMain.handle('change-model', (event, newModel) => {
         currentModel = newModel;
@@ -85,7 +85,7 @@ function createWindow() {
             messages: messages,
             model: currentModel,
             temperature: 0.6,
-            max_tokens: 1024,
+            max_tokens: 8024,
             top_p: 0.95,
             stream: true,
             stop: null,

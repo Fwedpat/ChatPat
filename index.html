@@ -58,6 +58,43 @@
             -webkit-text-fill-color: initial; /* Remove rainbow effect from content */
         }
 
+        .agent-action {
+            background: linear-gradient(90deg, #00ff41, #00ff95, #00ffbf);
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 5px 0;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+            animation: agentPulse 2s ease-in-out infinite;
+        }
+
+        .agent-success {
+            background: linear-gradient(90deg, #00ff41, #39ff00);
+            color: #000;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin: 3px 0;
+            font-size: 11px;
+            display: inline-block;
+        }
+
+        .agent-error {
+            background: linear-gradient(90deg, #ff4757, #ff3742);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin: 3px 0;
+            font-size: 11px;
+            display: inline-block;
+        }
+
+        @keyframes agentPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
+
         @keyframes rainbowAnimation {
         0% {
             background-position: 0% 50%;
@@ -75,6 +112,43 @@
             width: calc(100% - 40px);
             height: auto;
             transition: all 0.3s ease;
+            position: relative;
+            padding: 6px;
+            background: linear-gradient(45deg, 
+                #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, 
+                #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff, #ff0080, #ff0000);
+            background-size: 400% 400%;
+            border-radius: 16px;
+            animation: rainbowBorder 3s ease infinite;
+        }
+
+        .window-content::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            bottom: 6px;
+            background: transparent;
+            border-radius: 10px;
+            z-index: 0;
+        }
+
+        .window-content > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes rainbowBorder {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .title-bar {
@@ -369,6 +443,7 @@
                     <option value="#9B59B6">Purple</option>
                 </select>
                 <select id="modelPicker" class="color-picker">
+                    <option value="qwen-qwq-32b">QwQ 🐱</option>
                     <option value="deepseek-r1-distill-llama-70b">Deepseek 🐳</option>
                     <option value="llama-3.3-70b-versatile">Llama 3.3 🦙</option>
                     <option value="llama-3.1-70b-versatile">Llama 3.1 🦙</option>
@@ -392,4 +467,4 @@
     </div>
     <script src="renderer.js"></script>
 </body>
-</html> 
+</html>

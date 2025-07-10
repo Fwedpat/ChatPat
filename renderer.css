@@ -1,0 +1,51 @@
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+html, body {
+    background-color: transparent;
+}
+
+#app-container {
+    position: relative;
+    background-color: #111; /* Or your app's background color */
+    border-radius: 12px;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+#app-container::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        transparent,
+        rgba(168, 85, 247, 0.8),
+        rgba(236, 72, 153, 0.8),
+        rgba(239, 68, 68, 0.8),
+        rgba(234, 179, 8, 0.8),
+        rgba(5, 150, 105, 0.8),
+        rgba(59, 130, 246, 0.8),
+        transparent 30%
+    );
+    animation: rotate 4s linear infinite;
+}
+
+#app-container::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 4px;
+    background-color: #111; /* Must match app-container background */
+    border-radius: 10px;
+}

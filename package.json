@@ -1,7 +1,7 @@
 {
   "name": "patgpt",
   "version": "1.0.0",
-  "description": "",
+  "description": "Chatpat: LLM &amp; CLI Chat Interface",
   "main": "index.js",
   "scripts": {
     "start": "electron .",
