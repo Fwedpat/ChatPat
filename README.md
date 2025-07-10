@@ -15,7 +15,7 @@ ChatPat is an interactive chat application that leverages the power of Large Lan
 
 ## Example
 
-![ChatPat Example](readme_example.png)
+![ChatPat Example](Readme_Example.png)
 
 ## Installation
 
